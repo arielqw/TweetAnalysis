@@ -1,6 +1,4 @@
 <h1>How our program works</h1>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 our project has 3 main Entities: The Manager, the Worker and the Local Application.
 we used the ami-b66ed3de t2.small for out worker instances, and t2.micro for the managaer instance.
@@ -10,22 +8,22 @@ We used 5 SQS Queues:
 ---------------------
 
 (1) tasks - each item in the queue represents a new task added by a local app which will
-    be handled by the Manager.
+    be handled by the Manager.<br>
 (2) finished tasks - consists of all of the completed tasks which results are ready for 
-    the local app to recieve.
+    the local app to recieve.<br>
 (3) raw_tweets - each tweet message from any local app is split into 2 small tasks - 
-    entities and sentiment analysis.
+    entities and sentiment analysis.<br>
 (4) processed_tweets - consists of 2 output tweets for each input tweet, one for it's 
-    sentiment analysis, and the other for it's entities.
+    sentiment analysis, and the other for it's entities.<br>
 (5) log - the manager, worker and the local-app, are updating this queue in case of errors and exceptions
 
 We also used 4 S3 buckets:
 --------------------------
 
-(1) jars - containing all of the jar files that will be downloaded and run by the EC2 instances.
-(2) input - containing all the input files uploaded by the local applications.
-(3) output - containing all the output files (2 for each local app) uploaded by the manager.
-(4) log - contains the logging files of each local application and manager.
+(1) jars - containing all of the jar files that will be downloaded and run by the EC2 instances.<br>
+(2) input - containing all the input files uploaded by the local applications.<br>
+(3) output - containing all the output files (2 for each local app) uploaded by the manager.<br>
+(4) log - contains the logging files of each local application and manager.<br>
 
 
 
@@ -51,32 +49,32 @@ count for sentiments and entities that were analyzed for the task's tweet.
 The Manager constantly handles both receiving new tasks from the tasks queue, and joining processed tweets
 to a completed task.
 The Manager main loop alternates between the above two actions:
-	(1) The Manager checks if there are new tasks (not a terminate task). If so:
-				(1) takes the DE serialized message (as a TaskMessage)
-				(2) downloads it's relevant input file.
-				(3) adds it's tweet to the raw_tweets queue.
-				(4) creates workers instances of the amount needed.
-				(5) delete task from tasks queue.
-	(2) second, the Manager takes the available processed tweets from their queue. and:
-				(1) takes the DE serialized message (as a TweetMas).
-				(2) writes the tweet's entities or sentiment to the relevant output file.
-				(3) update the task's status to the current entities or sentiment counts.
-				(4) deletes the processed tweet from the queues.
-				(5) If the tweet's task is finished, upload both output files to the
-				    output bucket in S3, and adds the tasks to the finished tasks queue.
-(*) if the tasks is a termination task, the Manager will terminate all workers only after finishing the tasks
+	(1) The Manager checks if there are new tasks (not a terminate task). If so:<br>
+				(1) takes the DE serialized message (as a TaskMessage)<br>
+				(2) downloads it's relevant input file.<br>
+				(3) adds it's tweet to the raw_tweets queue.<br>
+				(4) creates workers instances of the amount needed.<br>
+				(5) delete task from tasks queue.<br>
+	(2) second, the Manager takes the available processed tweets from their queue. and:<br>
+				(1) takes the DE serialized message (as a TweetMas).<br>
+				(2) writes the tweet's entities or sentiment to the relevant output file.<br>
+				(3) update the task's status to the current entities or sentiment counts.<br>
+				(4) deletes the processed tweet from the queues.<br>
+				(5) If the tweet's task is finished, upload both output files to the<br>
+				    output bucket in S3, and adds the tasks to the finished tasks queue.<br>
+(*) if the tasks is a termination task, the Manager will terminate all workers only after finishing the tasks<br>
     that are still in process, and will then terminate its self.
 
 
 	The Worker
 	------------
-The Worker performs an infinite loop, in which it:
-	(1) receives a raw tweet as a message from the raw_tweets queue.
-	(2) processes the the tweet according to the TweetMsg's required task (entities or sentiment)
-	(3) serializes the TweetMsg and sends it to the processed_tweets queue.
-	(4) deletes the TweetMsg from queue.
+The Worker performs an infinite loop, in which it:<br>
+	(1) receives a raw tweet as a message from the raw_tweets queue.<br>
+	(2) processes the the tweet according to the TweetMsg's required task (entities or sentiment)<br>
+	(3) serializes the TweetMsg and sends it to the processed_tweets queue.<br>
+	(4) deletes the TweetMsg from queue.<br>
 
-(*)The worker will be terminated only by the Manager, which will do so only after the worker 
+(*)The worker will be terminated only by the Manager, which will do so only after the worker <br>
    will complete it's current task.
 
 
@@ -84,9 +82,9 @@ The Worker performs an infinite loop, in which it:
 	Message Classes
 	---------------
 
-(1) TweetMsg - each tweet is represented by a AWS Message where the body is the tweet string, attributes of output filename and uuid, task (sentiment or entities)
-(2) TaskMessage -  represents a whole task requested by a local app.
-(3) TaskStatus - represents the analysis progression status of one task requested by a local app.
+(1) TweetMsg - each tweet is represented by a AWS Message where the body is the tweet string, attributes of output filename and uuid, task (sentiment or entities)<br>
+(2) TaskMessage -  represents a whole task requested by a local app.<br>
+(3) TaskStatus - represents the analysis progression status of one task requested by a local app.<br>
 
 
 	Run Time for input example
